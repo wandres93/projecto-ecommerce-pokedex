@@ -9,7 +9,7 @@ function App() {
   return (
     <>
       <NavBar />
-      <ItemListContainer greeting="¡Bienvenido a MiPokedex! Descubre nuestros Pokemones destacados." />
+      <ItemListContainer greeting="¡Bienvenido a PokéStore! ⚡ Encuentra tu Pokémon ideal." />
     </>
   );
 }
