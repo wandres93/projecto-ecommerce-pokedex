@@ -1,18 +1,43 @@
-import { Container, Card } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { getProducts, getProductsByCategory } from "../asyncMock";
+import ItemList from "./ItemList";
+import { useParams } from "react-router-dom";
+import { Container } from "react-bootstrap";
 
 function ItemListContainer({ greeting }) {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const { categotyId } = useParams();
+
+  useEffect(() => {
+    setLoading(true);
+
+    const asyncFunc = categotyId ? getProductsByCategory : getProducts;
+
+    asyncFunc(categotyId)
+      .then((response) => {
+        setProducts(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [categotyId]);
+
   return (
     <Container className="text-center mt-5">
-      <h2 className="mb-4">{greeting}</h2>
-      <Card className="p-4 bg-light border-0 shadow-sm">
-        <p>¡Atrapa a tus Pokémon favoritos y agrégalos a tu colección!</p>
-        <img
-          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
-          alt="Pikachu"
-          width="100"
-        />
-        <p className="mt-3">Próximamente: catálogo de Pokémon disponibles ⚡</p>
-      </Card>
+      <h2 className="text-center mb-4">
+        {greeting}{" "}
+        <span style={{ textTransform: "capitalize" }}>{categotyId}</span>{" "}
+      </h2>
+      {loading ? (
+        <p className="text-center">Cargando Pokémon...</p>
+      ) : (
+        <ItemList products={products} />
+      )}
     </Container>
   );
 }
