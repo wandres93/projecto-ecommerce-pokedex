@@ -1,14 +1,25 @@
-import { Card, Row, Col } from "react-bootstrap";
+import { useState, useContext } from "react";
+import { Card, Row, Col, Button } from "react-bootstrap";
 import ItemCount from "./ItemCount";
+import { Link } from "react-router-dom";
+import { CartContext } from "../context/CartContext";
 
 function ItemDetail({ id, name, img, category, description, price, stock }) {
+  const [quantityAdded, setQuantityAdded] = useState(0);
+
+  const { addItem } = useContext(CartContext);
+
+  const handleOnAdd = (quantity) => {
+    setQuantityAdded(quantity);
+
+    const item = { id, name, price, img };
+    addItem(item, quantity);
+  };
+
   return (
     <Card className="p-3 shadow-lg border-0">
       <Row>
-        <Col
-          md={6}
-          className="d-flex justify-content-center align-items-center"
-        >
+        <Col md={6} className="d-flex justify-content-center">
           <Card.Img
             src={img}
             alt={name}
@@ -17,18 +28,18 @@ function ItemDetail({ id, name, img, category, description, price, stock }) {
         </Col>
         <Col md={6}>
           <Card.Body>
-            <h1 className="display-5">{name}</h1>
-            <h3 className="text-muted text-capitalize">{category}</h3>
-            <p className="lead mt-4">{description}</p>
-            <h2 className="text-danger my-4">${price}</h2>
+            <h1>{name}</h1>
+            <h3>${price}</h3>
+            <p>{description}</p>
+            <p>Stock: {stock}</p>
 
-            <p>Stock disponible: {stock}</p>
-
-            <ItemCount
-              initial={1}
-              stock={stock}
-              onAdd={(quantity) => console.log("Cantidad agregada: ", quantity)}
-            />
+            {quantityAdded > 0 ? (
+              <Link to="/cart" className="btn btn-success w-100">
+                Terminar compra
+              </Link>
+            ) : (
+              <ItemCount initial={1} stock={stock} onAdd={handleOnAdd} />
+            )}
           </Card.Body>
         </Col>
       </Row>

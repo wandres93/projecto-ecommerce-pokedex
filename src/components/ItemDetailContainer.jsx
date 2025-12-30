@@ -1,24 +1,28 @@
 import { useState, useEffect } from "react";
-import { getProductById } from "../asyncMock";
 import ItemDetail from "./ItemDetail";
 import { useParams } from "react-router-dom";
 import { Container } from "react-bootstrap";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "../firebase/config";
 
 function ItemDetailContainer() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const { itemId } = useParams();
 
   useEffect(() => {
     setLoading(true);
 
-    getProductById(itemId)
+    const docRef = doc(db, "products", itemId);
+
+    getDoc(docRef)
       .then((response) => {
-        setProduct(response);
+        const data = response.data();
+        const productAdapted = { id: response.id, ...data };
+        setProduct(productAdapted);
       })
       .catch((error) => {
-        setProduct(response);
+        console.error(error);
       })
       .finally(() => {
         setLoading(false);
@@ -27,11 +31,7 @@ function ItemDetailContainer() {
 
   return (
     <Container className="mt-5">
-      {loading ? (
-        <p className="text-center">Cargando detalle...</p>
-      ) : (
-        <ItemDetail {...product} />
-      )}
+      {loading ? <p>Cargando detalle...</p> : <ItemDetail {...product} />}
     </Container>
   );
 }

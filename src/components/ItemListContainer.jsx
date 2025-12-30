@@ -1,23 +1,29 @@
 import { useState, useEffect } from "react";
-import { getProducts, getProductsByCategory } from "../asyncMock";
 import ItemList from "./ItemList";
 import { useParams } from "react-router-dom";
 import { Container } from "react-bootstrap";
+import { getDocs, collection, query, where } from "firebase/firestore";
+import { db } from "../firebase/config"; // Tu archivo de config
 
 function ItemListContainer({ greeting }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const { categotyId } = useParams();
+  const { categoryId } = useParams();
 
   useEffect(() => {
     setLoading(true);
 
-    const asyncFunc = categotyId ? getProductsByCategory : getProducts;
+    const collectionRef = categoryId
+      ? query(collection(db, "products"), where("category", "==", categoryId))
+      : collection(db, "products");
 
-    asyncFunc(categotyId)
+    getDocs(collectionRef)
       .then((response) => {
-        setProducts(response);
+        const productsAdapted = response.docs.map((doc) => {
+          const data = doc.data();
+          return { id: doc.id, ...data };
+        });
+        setProducts(productsAdapted);
       })
       .catch((error) => {
         console.error(error);
@@ -25,19 +31,12 @@ function ItemListContainer({ greeting }) {
       .finally(() => {
         setLoading(false);
       });
-  }, [categotyId]);
+  }, [categoryId]);
 
   return (
-    <Container className="text-center mt-5">
-      <h2 className="text-center mb-4">
-        {greeting}{" "}
-        <span style={{ textTransform: "capitalize" }}>{categotyId}</span>{" "}
-      </h2>
-      {loading ? (
-        <p className="text-center">Cargando Pokémon...</p>
-      ) : (
-        <ItemList products={products} />
-      )}
+    <Container className="mt-5">
+      <h2 className="text-center mb-4">{greeting}</h2>
+      {loading ? <p>Cargando...</p> : <ItemList products={products} />}
     </Container>
   );
 }

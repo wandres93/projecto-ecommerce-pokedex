@@ -1,12 +1,12 @@
 import CartWidget from "./CartWidget";
 import { Navbar, Container, Nav } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { Link, NavLink } from "react-router-dom";
 
 function NavBar() {
   return (
     <Navbar bg="danger" variant="dark" expand="lg" className="shadow-sm">
       <Container>
-        <Navbar.Brand href="#">
+        <Navbar.Brand as={Link} to="/">
           <img
             src="https://raw.githubusercontent.com/PokeAPI/media/master/logo/pokeapi_256.png"
             alt="logo"
@@ -19,10 +19,18 @@ function NavBar() {
         <Navbar.Toggle aria-controls="navbar-nav" />
         <Navbar.Collapse id="navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#">Inicio</Nav.Link>
-            <Nav.Link href="#">Pokémon</Nav.Link>
-            <Nav.Link href="#">Accesorios</Nav.Link>
-            <Nav.Link href="#">Contacto</Nav.Link>
+            <Nav.Link as={NavLink} to="/category/electrico">
+              Eléctrico
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/category/fuego">
+              Fuego
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/category/agua">
+              Agua
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/category/planta">
+              Planta
+            </Nav.Link>
           </Nav>
           <CartWidget />
         </Navbar.Collapse>
